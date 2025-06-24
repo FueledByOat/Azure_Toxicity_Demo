@@ -11,7 +11,11 @@ logger = logging.getLogger("toxicity")
 logging.basicConfig(level=logging.INFO)
 
 if not SIMULATE:
-    classifier = pipeline("text-classification", model="unitary/toxic-bert")
+    try:
+        classifier = pipeline("text-classification", model="unitary/toxic-bert")
+    except Exception as e:
+        logger.error(f"Failed to load model: {e}")
+        classifier = None
 else:
     classifier = None
 
