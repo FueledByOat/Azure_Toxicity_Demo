@@ -22,17 +22,15 @@ jobs:
           # Copy app files to root
           cp app/main.py .
           cp -r app/templates .
+          # Create ZIP for deployment
+          zip -r app.zip main.py templates/ requirements.txt startup.txt
           ls -la
           
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            main.py
-            templates/
-            requirements.txt
-            startup.txt
+          path: app.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,6 +44,12 @@ jobs:
         with:
           name: python-app
           path: ./deploy
+      
+      - name: Unzip deployment package
+        run: |
+          cd deploy
+          unzip app.zip
+          ls -la
       
       - name: Login to Azure
         uses: azure/login@v2
