@@ -125,10 +125,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.__clientidsecretname__ }}
-          tenant-id: ${{ secrets.__tenantidsecretname__ }}
-          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
 
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_33327CFA446149A8B8C5CFBCDA7E0170 }}
+
+
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0A0B9B7674D34000988E9419D40A1302 }}
+
+
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_CDD1D144A71F4598964FCCD6E9AA8ACA }}
 
       - name: 'Deploy to Azure Web App'
 
@@ -141,3 +145,4 @@ jobs:
           app-name: 'AZURETOXICITYDEMO'
 
           slot-name: 'Production'
+          package: ./toxicity_detector_app
