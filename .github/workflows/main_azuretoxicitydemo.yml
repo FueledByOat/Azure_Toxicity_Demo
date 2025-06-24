@@ -70,13 +70,15 @@ jobs:
 
 
 
-      - name: Zip only app + requirements.txt
+      - name: Prepare deployment package
 
         run: |
           mkdir packaged
           cp -r app packaged/
           cp requirements.txt packaged/
-          cd packaged && zip -r ../release.zip . && cd ..
+          cd packaged 
+          zip -r ../release.zip .
+          cd ..
 
 
 
