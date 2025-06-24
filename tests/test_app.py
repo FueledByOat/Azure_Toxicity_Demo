@@ -1,6 +1,6 @@
 # tests/test_app.py
 import pytest
-from toxicity_detector_app.main import app
+from app.main import app
 
 @pytest.fixture
 def client():
