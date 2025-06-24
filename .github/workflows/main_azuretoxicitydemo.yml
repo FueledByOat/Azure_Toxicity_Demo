@@ -145,4 +145,4 @@ jobs:
           app-name: 'AZURETOXICITYDEMO'
 
           slot-name: 'Production'
-          package: ./toxicity_detector_app
+          package: .
