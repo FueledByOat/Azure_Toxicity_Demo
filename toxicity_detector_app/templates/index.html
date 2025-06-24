@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toxicity Detector</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>Toxicity Detector</h1>
+        <p class="subtitle">Analyze text content for potential toxicity using AI</p>
+
+        <div class="input-section">
+            <label for="textInput">Enter text to analyze:</label>
+            <textarea id="textInput" placeholder="Type or paste your text here... (e.g., 'we hate her!')"
+                maxlength="1000"></textarea>
+        </div>
+
+        <button class="analyze-btn" onclick="analyzeText()">
+            Analyze Text
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Analyzing text...
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="results-section" id="resultsSection">
+            <h3 class="results-title">Analysis Results</h3>
+            <div id="resultsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        async function analyzeText() {
+            const textInput = document.getElementById("textInput");
+            const analyzeBtn = document.querySelector(".analyze-btn");
+            const loading = document.getElementById("loading");
+            const resultsSection = document.getElementById("resultsSection");
+            const resultsContainer = document.getElementById("resultsContainer");
+            const errorMessage = document.getElementById("errorMessage");
+
+            const text = textInput.value.trim();
+
+            if (!text) {
+                showError("Please enter some text to analyze.");
+                return;
+            }
+
+            // Reset UI
+            hideError();
+            resultsSection.style.display = "none";
+            loading.style.display = "block";
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = "Analyzing...";
+
+            try {
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const results = await response.json();
+                displayResults(results);
+
+            } catch (error) {
+                console.error("Error:", error);
+                showError("Failed to analyze text. Please try again.");
+            } finally {
+                loading.style.display = "none";
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = "Analyze Text";
+            }
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById("resultsContainer");
+            const resultsSection = document.getElementById("resultsSection");
+
+            resultsContainer.innerHTML = "";
+
+            results.forEach(result => {
+                const isToxic = result.label.toLowerCase() === "toxic";
+                const percentage = Math.round(result.score * 100);
+
+                const resultCard = document.createElement("div");
+                resultCard.className = "result-card";
+
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <span class="result-label ${isToxic ? 'toxic' : 'non-toxic'}">
+                            ${result.label}
+                        </span>
+                        <span class="result-score ${isToxic ? 'score-toxic' : 'score-safe'}">
+                            ${percentage}%
+                        </span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill ${isToxic ? 'confidence-toxic' : 'confidence-safe'}" 
+                             style="width: ${percentage}%"></div>
+                    </div>
+                `;
+
+                resultsContainer.appendChild(resultCard);
+            });
+
+            resultsSection.style.display = "block";
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById("errorMessage");
+            errorMessage.textContent = message;
+            errorMessage.style.display = "block";
+        }
+
+        function hideError() {
+            const errorMessage = document.getElementById("errorMessage");
+            errorMessage.style.display = "none";
+        }
+
+        // Allow Enter key to submit (Ctrl+Enter for new line)
+        document.getElementById("textInput").addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.ctrlKey && !e.shiftKey) {
+                e.preventDefault();
+                analyzeText();
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById("textInput").addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = Math.min(this.scrollHeight, 200) + "px";
+        });
+    </script>
+</body>
+
+</html>
