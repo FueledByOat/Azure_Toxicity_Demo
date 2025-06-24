@@ -11,30 +11,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-
+      
       - name: Install dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
-
+      
       - name: Package app for deployment
         run: |
           mkdir packaged
-          cp -r app packaged/
+          # Copy app contents to root level
+          cp -r app/* packaged/
           cp requirements.txt packaged/
+          cp startup.txt packaged/
           cd packaged
           zip -r ../release.zip .
           cd ..
-
+      
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -47,23 +48,22 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
-
+      
       - name: Unzip artifact
         run: unzip release.zip
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_33327CFA446149A8B8C5CFBCDA7E0170 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0A0B9B7674D34000988E9419D40A1302 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_CDD1D144A71F4598964FCCD6E9AA8ACA }}
-
+      
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:

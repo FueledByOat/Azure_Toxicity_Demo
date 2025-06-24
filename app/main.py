@@ -1,6 +1,5 @@
-# toxicity_detector_app/main.py
 from flask import Flask, request, jsonify, render_template
-from transformers import pipeline
+# from transformers import pipeline
 import logging
 import os
 
@@ -28,12 +27,12 @@ def analyze():
     data = request.json
     text = data.get("text", "")
     logger.info(f"Received text: {text}")
-
+    
     if SIMULATE:
         result = [{"label": "toxic", "score": 0.87}]
     else:
         result = classifier(text)
-
+    
     logger.info(f"Result: {result}")
     return jsonify(result)
 
@@ -42,4 +41,6 @@ def health():
     return jsonify(status="healthy")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Get port from environment variable (Azure sets this)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(host='0.0.0.0', port=port, debug=False)
