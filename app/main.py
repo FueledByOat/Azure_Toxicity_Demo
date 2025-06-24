@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__, template_folder="templates")
 
-SIMULATE = os.getenv("SIMULATE_MODEL", "false").lower() == "true"
+SIMULATE = os.getenv("SIMULATE_MODEL", "true").lower() == "true"
 logger = logging.getLogger("toxicity")
 logging.basicConfig(level=logging.INFO)
 
