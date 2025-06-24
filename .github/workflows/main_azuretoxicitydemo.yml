@@ -7,49 +7,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      
-      - name: Create deployment package
-        run: |
-          # Copy app files to root
-          cp app/main.py .
-          cp -r app/templates .
-          # Create ZIP for deployment
-          zip -r app.zip main.py templates/ requirements.txt startup.txt
-          ls -la
-          
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: app.zip
-
   deploy:
     runs-on: ubuntu-latest
-    needs: build
     permissions:
       id-token: write
       contents: read
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
-          path: ./deploy
-      
-      - name: Unzip deployment package
-        run: |
-          cd deploy
-          unzip app.zip
-          ls -la
+      - uses: actions/checkout@v4
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -63,4 +27,4 @@ jobs:
         with:
           app-name: 'AZURETOXICITYDEMO'
           slot-name: 'Production'
-          package: ./deploy
+          package: .
