@@ -30,7 +30,7 @@ def analyze():
     logger.info(f"Received text: {text}")
     
     if SIMULATE:
-        result = [{"label": "toxic", "score": round(random.random()*100, 2)}]
+        result = [{"label": "toxic", "score": round(random.random(), 2)}]
     else:
         result = classifier(text)
     
