@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 # from transformers import pipeline
 import logging
 import os
+import random
 
 app = Flask(__name__, template_folder="templates")
 
@@ -29,7 +30,7 @@ def analyze():
     logger.info(f"Received text: {text}")
     
     if SIMULATE:
-        result = [{"label": "toxic", "score": 0.87}]
+        result = [{"label": "toxic", "score": round(random.random()*100, 2)}]
     else:
         result = classifier(text)
     
